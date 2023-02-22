@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 def plot():
     fig, axs = plt.subplots(nrows=2, ncols=1, figsize=(10, 10), sharex=True)
 
-    D = np.logspace(-2, 2)
+    D = np.logspace(-2, 2, num=1000)
     IL = 300
     IH = 170
     B = 2.71

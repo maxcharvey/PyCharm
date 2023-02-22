@@ -1,8 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-
-fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10, 15), sharex=True)
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(16, 8), sharex=True)
 cols = ['r', 'm', 'g', 'c', 'b']
 for i, D in enumerate(np.linspace(0.35, 1.35, 5)):
     print(D)
@@ -19,15 +18,15 @@ for i, D in enumerate(np.linspace(0.35, 1.35, 5)):
         A = 202
         B = 2.71
         Ca = 1.02e7
-        EL[0] = A+B*(TL[0]-273)
-        EH[0] = A+B*(TH[0]-273)
+        EL[0] = A + B * (TL[0] - 273)
+        EH[0] = A + B * (TH[0] - 273)
         IL = 300
         IH = 170
         max_t = 365
         steps = np.linspace(0, max_t, no_steps)
-        stepsize = max_t/no_steps
+        stepsize = max_t / no_steps
 
-        for t in range(0,len(steps)-1):
+        for t in range(0, len(steps) - 1):
             f[t] = 2 * D * (TL[t] - TH[t])
             EL[t + 1] = A + B * (TL[t] - 273)
             EH[t + 1] = A + B * (TH[t] - 273)
@@ -35,14 +34,13 @@ for i, D in enumerate(np.linspace(0.35, 1.35, 5)):
             TL[t + 1] = TL[t] + ((IL - EL[t + 1] - f[t]) / Ca * 86400) * stepsize
             TH[t + 1] = TH[t] + ((IH - EH[t + 1] + f[t]) / Ca * 86400) * stepsize
 
-        axs[0].plot(steps, TL-273, '--', c='C'+str(i))
-        axs[0].plot(steps, TH-273, '-.', c='C'+str(i))
+        axs[0].plot(steps, TL - 273, '--', lw=1, c='C' + str(i))
+        axs[0].plot(steps, TH - 273, '-.', lw=1, c='C' + str(i))
 
-        axs[1].plot(steps, EL, '--', c='C'+str(i))
-        axs[1].plot(steps, EH, '-.', c='C'+str(i))
+        axs[1].plot(steps, EL, '--', lw=1, c='C' + str(i))
+        axs[1].plot(steps, EH, '-.', lw=1, c='C' + str(i))
 
-        axs[2].plot(steps[:-1], f[:-1], c='C'+str(i))
-
+        axs[2].plot(steps[:-1], f[:-1], lw=1, c='C' + str(i))
 
 axs[1].plot([0, max_t], [IL, IL], 'k--')
 axs[1].plot([0, max_t], [IH, IH], 'k-.')
@@ -54,4 +52,3 @@ axs[0].fill_between(steps, 27, 15, color='lightgray')
 axs[0].fill_between(steps, -5, 5, color='lightgray')
 
 plt.show()
-
