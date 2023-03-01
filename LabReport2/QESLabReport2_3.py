@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 alpha = 2e-4
 beta = 7e-4
 k = 8.3e17
-taulist = [2, 20, 200]
+taulist = [2, 10, 50, 100, 200]
 
 SA_ocean = 3.58e14
 AL = SA_ocean * 0.85
@@ -31,19 +31,20 @@ TL[0] = 298.
 SL[0] = 37.
 TH[0] = 273.
 SH[0] = 33.
-TatL = 30. + 273.
+TatL = 20. + 273.
 TatH = 0. + 273.
 
 fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10, 15), sharex=True)
 
 
-for i in range(3):
+for i in range(5):
     tau = taulist[i]
-    print(tau)
     for t in range(0, steps - 1):
         delT = TL[t] - TH[t]
         delS = SL[t] - SH[t]
         Q[t] = k * (alpha * delT - beta * delS)
+        #if 100 <= t <= 200:
+            #SH[t] = SH[t] - 0.002
         if Q[t] > 0:
             TL[t + 1] = TL[t] + stepsize * (-Q[t] * delT - (VL / tau) * (TL[t] - TatL)) / VL
             TH[t + 1] = TH[t] + stepsize * (Q[t] * delT - (VH / tau) * (TH[t] - TatH)) / VH

@@ -1,4 +1,4 @@
-import cbsyst
+# import cbsyst
 from tools import plot
 import numpy as np
 import matplotlib.pyplot as plt
@@ -135,12 +135,21 @@ def ocean_model(lolat, hilat, deep, tmax, dt):
 
 time, lolat, hilat, deep = ocean_model(init_lolat, init_hilat, init_deep, 1000, 0.5)
 
-fig, axs = plot.boxes(time, ['T', 'S'], lolat, hilat, deep)
+orig_hilat = init_hilat.copy()
+orig_hilat['tau_M'] = 10000
+time, lolat, hilat2, deep = ocean_model(init_lolat, orig_hilat, init_deep, 1000, 0.5)
 
-plt.show()
+orig_hilat['tau_M'] = 10
+time, lolat, hilat3, deep = ocean_model(init_lolat, orig_hilat, init_deep, 1000, 0.5)
+
+init_hilat = orig_hilat
+
+fig, axs = plot.boxes(time, ['T', 'S'], hilat, hilat2, hilat3)
 
 model_vars = ['T', 'S']
 for var in model_vars:
     print(var)
     for box in [hilat, lolat, deep]:
         print(f"  {box['name']}: {box[var][-1]:.2f}")
+
+plt.show()
