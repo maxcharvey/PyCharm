@@ -105,7 +105,7 @@ def ocean_model(dicts, tmax, dt):
     time = np.arange(0, tmax + dt, dt)
 
     # identify which variables will change with time
-    model_vars = ['T', 'S', 'TA', 'DIC']  # --> TODO: Add DIC and TA here - Done
+    model_vars = ['T', 'S', 'TA', 'DIC']  # -->
     atmos_model_vars = ['moles_CO2', 'pCO2']
 
     # create copies of the input dictionaries so we don't modify the originals
