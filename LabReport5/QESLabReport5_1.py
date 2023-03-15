@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from cbsyst import Csys
 from tools import plot
+from tools import helpers
 
 # global variables
 V_ocean = 1.34e18  # volume of the ocean in m3
@@ -218,9 +219,46 @@ def ocean_model(lolat, hilat, deep, atmos, tmax, dt):
 
 
 def run():
-    time, lolat, hilat, deep, atmos = ocean_model(init_lolat, init_hilat, init_deep, init_atmos, 1000, 0.5)
-    fig, axs = plot.boxes(time, ['DIC', 'TA', 'pCO2', 'PO4'], lolat, hilat, deep, atmos)
+    tmax = 3000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = init_atmos.copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 200) & (time <= 400)] = 8.0
+
+    X1_init_hilat = init_hilat.copy()
+    X1_init_lolat = init_lolat.copy()
+    X1_init_hilat['f_CaCO3'] /= 2
+    X1_init_lolat['f_CaCO3'] /= 2
+
+    X2_init_hilat = X1_init_hilat.copy()
+    X2_init_lolat = X1_init_lolat.copy()
+    X2_init_hilat['tau_PO4'] *= 2
+    X2_init_lolat['tau_PO4'] *= 2
+
+    # Run models
+    time, lolat, hilat, deep, atmos = ocean_model(init_lolat, init_hilat, init_deep, emit_atmos, 3000, 0.5)
+    X1_time, X1_lolat, X1_hilat, X1_deep, X1_atmos = ocean_model(X1_init_lolat, X1_init_hilat, init_deep, emit_atmos,
+                                                                  3000, 0.5)
+    X2_time, X2_lolat, X2_hilat, X2_deep, X2_atmos = ocean_model(X2_init_lolat, X2_init_hilat, init_deep, emit_atmos,
+                                                                 3000, 0.5)
+
+    # Make Plots
+    fig, axs = plot.boxes(time, ['pCO2', 'GtC_emissions'], lolat, hilat, deep, atmos)
+
+    plot.boxes(X1_time, ['pCO2', 'GtC_emissions'], X1_lolat, X1_hilat, X1_deep, X1_atmos, axs=axs, ls=':', label='low calc')
+    plot.boxes(X2_time, ['pCO2', 'GtC_emissions'], X2_lolat, X2_hilat, X2_deep, X2_atmos, axs=axs, ls='--', label='low bio')
+    axs[-1].plot(time, emit_atmos['GtC_emissions'], c='orange')
+    axs[-1].legend(fontsize=8)
+
+    for k, v in helpers.get_last_values(X1_hilat, X1_lolat, X1_atmos).items():
+        print(k, v['pCO2'])
+    for k, v in helpers.get_last_values(X2_hilat, X2_lolat, X2_atmos).items():
+        print(k, v['pCO2'])
+
     plt.show()
+
 
 if __name__ == '__main__':
     run()

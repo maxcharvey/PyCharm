@@ -27,11 +27,14 @@ E = Fw * SA_ocean * (1 - fSA_hilat) * Sref  # amount of salt removed from the lo
 
 # NOTE: Initial DIC, TA, PO4 and pCO2 values are set to steady state values from the Ocean Acidification model.
 
-particle_velocity = 10  # m d-1
+particle_velocity = 10 # m d-1
 k_diss = -0.07  # d-1
 n_diss = 2.0  # unitless
 Omega_crit = 2.5  # unitless
 calc_slope = 0.12  # f_CaCO3 / Omega
+
+rho_org = 1100
+rho_CaCO3 = 2700
 
 def create_dicts():
     init_hilat = {
@@ -51,8 +54,9 @@ def create_dicts():
         'PO4': 8.90099e-05,  # Phosphate conc, mol m-3
         'f_CaCO3': 0.18134,  # fraction of organic matter export that produces CaCO3 at starting [CO3]
         'k_ballast': 0.0805,
+        'rho_particle': 1416.27,
     }
-    init_hilat['V'] = init_hilat['SA'] *  init_hilat['depth']  # box volume, m3
+    init_hilat['V'] = init_hilat['SA'] * init_hilat['depth']  # box volume, m3
 
     init_lolat = {
         'name': 'lolat',
@@ -71,8 +75,9 @@ def create_dicts():
         'PO4': 1.65460e-04,  # Phosphate conc, mol m-3
         'f_CaCO3': 0.30453,  # fraction of organic matter export that produces CaCO3 at starting [CO3]
         'k_ballast': 0.1609,
+        'rho_particle': 1416.27,
     }
-    init_lolat['V'] = init_lolat['SA'] *  init_lolat['depth']  # box volume, m3
+    init_lolat['V'] = init_lolat['SA'] * init_lolat['depth']  # box volume, m3
 
     init_deep = {
         'name': 'deep',
