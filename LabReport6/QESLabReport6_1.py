@@ -101,7 +101,7 @@ def create_dicts():
     init_hilat['particle_sinking_time'] = init_hilat['depth'] / particle_velocity
     init_lolat['particle_sinking_time'] = init_lolat['depth'] / particle_velocity
 
-    return init_lolat, init_hilat, init_deep, init_atmos
+    return [init_lolat, init_hilat, init_deep, init_atmos]
 
 def run():
     # perform baseline model run
@@ -112,9 +112,21 @@ def run():
     # plot.boxes(oatime, vars, oalolat, oahilat, oadeep, oaatmos)
 
     bldicts = create_dicts()
+
+
+    tmax = 2000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = bldicts[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+
+    bldicts[3] = emit_atmos
+
     bltime, bldicts = ballasting_model(bldicts, 2000, 0.5)
     bllolat, blhilat, bldeep, blatmos = bldicts
-    vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'Omega']
+    vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'GtC_emissions']
     plot.boxes(bltime, vars, bllolat, blhilat, bldeep, blatmos)
 
     # for k, v in helpers.get_last_values(ohilat, ololat, odeep, oatmos).items():
