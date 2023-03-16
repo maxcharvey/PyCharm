@@ -116,7 +116,7 @@ def ballasting_model(dicts, tmax, dt):
             # CO2 exchange with atmosphere
             fluxes[f'dCO2_{boxname}'] = box['V'] / box['tau_CO2'] * (
                     box['CO2'][last] - 1e-3 * atmos['pCO2'][last] * box['K0'][last]) * dt  # mol dt-1
-            # organic matter production TODO: finish this bit
+            # organic matter production
             v = particle_velocity/(box['rho_particle'] - 1000) * ((rho_org + box['f_CaCO3'][last] * (100/30) * rho_org)/
                                                                  (1 + box['f_CaCO3'][last] * (100/30) * (rho_org/rho_CaCO3))
                                                                  -1000)

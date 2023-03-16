@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(16, 8), sharex=True)
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(16, 12), sharex=True)
 cols = ['r', 'm', 'g', 'c', 'b']
 for i, D in enumerate(np.linspace(0.35, 1.35, 5)):
     print(D)
@@ -40,15 +40,29 @@ for i, D in enumerate(np.linspace(0.35, 1.35, 5)):
         axs[1].plot(steps, EL, '--', lw=1, c='C' + str(i))
         axs[1].plot(steps, EH, '-.', lw=1, c='C' + str(i))
 
-        axs[2].plot(steps[:-1], f[:-1], lw=1, c='C' + str(i))
+        if tl == 305:
+            axs[2].plot(steps[:-1], f[:-1], lw=1, c='C' + str(i), label=D)
+        else:
+            axs[2].plot(steps[:-1], f[:-1], lw=1, c='C' + str(i))
 
-axs[1].plot([0, max_t], [IL, IL], 'k--')
-axs[1].plot([0, max_t], [IH, IH], 'k-.')
+axs[1].plot([0, max_t], [IL, IL], 'k--', label='Low latitude incoming radiation')
+axs[1].plot([0, max_t], [IH, IH], 'k-.', label='High latitude incoming radiation')
 axs[0].set_ylabel('Temperature ( ̊C)')
 axs[1].set_ylabel('Heat Flux (Wm$^{-2}$)')
 axs[2].set_ylabel('Latitudinal Heat Flow (Wm$^{-2}$)')
 axs[2].set_xlabel('Time (Days)')
 axs[0].fill_between(steps, 27, 15, color='lightgray')
 axs[0].fill_between(steps, -5, 5, color='lightgray')
+axs[2].legend(title='Values of D', ncols=3, fancybox=True)
+axs[1].legend()
+axs[0].text(60, 10, "Low latitude values shown by the grey box above and high latitude ones shown in the grey box below")
+
+plt.suptitle('Effect of initial temperature on equilibrium temperature values '
+             'for different values of the diffusion constant', size='x-large')
+
+for i in axs:
+    i.set_xlim(0, 350)
+
+plt.savefig('QESLabReport11', dpi=600)
 
 plt.show()

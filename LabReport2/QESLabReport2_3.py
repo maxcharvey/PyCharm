@@ -34,8 +34,9 @@ SH[0] = 33.
 TatL = 20. + 273.
 TatH = 0. + 273.
 
-fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10, 15), sharex=True)
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(16, 12), sharex=True)
 
+cols_list = ['black', 'blue', 'green', 'orange', 'red']
 
 for i in range(5):
     tau = taulist[i]
@@ -55,19 +56,39 @@ for i in range(5):
     delS = SL[steps - 1] - SH[steps - 1]
     Q[steps - 1] = k * (alpha * delT - beta * delS)
 
-    axs[0].plot(times, TL - 273, '--', label=r'$T_L$')
-    axs[0].plot(times, TH - 273, '-.', label=r'$T_H$')
+    if tau == taulist[0]:
+        axs[0].plot(times, TL - 273, '--', label=r'$T_L$', c=cols_list[i])
+        axs[0].plot(times, TH - 273, '-.', label=r'$T_H$', c=cols_list[i])
 
-    axs[1].plot(times, SL, '--', label=r'$S_L$')
-    axs[1].plot(times, SH, '-.', label=r'$S_H$')
+        axs[1].plot(times, SL, '--', label=r'$S_L$', c=cols_list[i])
+        axs[1].plot(times, SH, '-.', label=r'$S_H$', c=cols_list[i])
 
-    axs[2].plot(times, Q)
+    else:
+        axs[0].plot(times, TL - 273, '--', c=cols_list[i])
+        axs[0].plot(times, TH - 273, '-.', c=cols_list[i])
+
+        axs[1].plot(times, SL, '--', c=cols_list[i])
+        axs[1].plot(times, SH, '-.', c=cols_list[i])
+
+    axs[2].plot(times, Q, label=tau, c=cols_list[i])
+
+    print(SH[-1])
+    print(SL[-1])
+    print(TH[-1])
+    print(TL[-1])
+for i in axs:
+    i.set_xlim(0, 1000)
 
 axs[0].legend()
 axs[1].legend()
+axs[2].legend()
 axs[0].set_ylabel('Temperature ( ̊C)')
-axs[1].set_ylabel('Salinity')
+axs[1].set_ylabel('Salinity (PSS)')
 axs[2].set_ylabel('Latitudinal flow strength ($m^{3}yr^{-1}$)')
 axs[2].set_xlabel('Time (years)')
+plt.suptitle("Sensitivity analysis of salinity and temperature for different timescales of atmosphere"
+             "ocean relaxation", size='x-large')
+
+plt.savefig('QESLabReport12', dpi=600)
 
 plt.show()
