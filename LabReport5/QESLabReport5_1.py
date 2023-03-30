@@ -245,17 +245,34 @@ def run():
                                                                  3000, 0.5)
 
     # Make Plots
-    fig, axs = plot.boxes(time, ['pCO2', 'GtC_emissions'], lolat, hilat, deep, atmos)
+    fig, axs = plot.boxes(time, ['pCO2', 'TA', 'DIC'], lolat, hilat, deep, atmos)
 
-    plot.boxes(X1_time, ['pCO2', 'GtC_emissions'], X1_lolat, X1_hilat, X1_deep, X1_atmos, axs=axs, ls=':', label='low calc')
-    plot.boxes(X2_time, ['pCO2', 'GtC_emissions'], X2_lolat, X2_hilat, X2_deep, X2_atmos, axs=axs, ls='--', label='low bio')
-    axs[-1].plot(time, emit_atmos['GtC_emissions'], c='orange')
-    axs[-1].legend(fontsize=8)
+    plot.boxes(X1_time, ['pCO2', 'TA', 'DIC'], X1_lolat, X1_hilat, X1_deep, X1_atmos, axs=axs, ls=':', label='low calc')
+    plot.boxes(X2_time, ['pCO2', 'TA', 'DIC'], X2_lolat, X2_hilat, X2_deep, X2_atmos, axs=axs, ls='--', label='low bio')
+    # axs[-1].plot(time, emit_atmos['GtC_emissions'], c='orange')
+    # axs[-1].legend(fontsize=8)
 
+    emission = np.linspace(200, 400, 200)
+
+    y_min = [200, 2.21, 1.9]
+    y_max = [1200, 2.32, 2.45]
+
+    for i in range(3):
+        axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
+        axs[i].set_ylim(y_min[i], y_max[i])
+
+    for k, v in helpers.get_last_values(hilat, lolat, atmos).items():
+        print(k, v['pCO2'])
     for k, v in helpers.get_last_values(X1_hilat, X1_lolat, X1_atmos).items():
         print(k, v['pCO2'])
     for k, v in helpers.get_last_values(X2_hilat, X2_lolat, X2_atmos).items():
         print(k, v['pCO2'])
+
+    print(atmos['pCO2'][400])
+    print(X1_atmos['pCO2'][400])
+    print(X2_atmos['pCO2'][400])
+
+    plt.savefig('QESLabReport15', dpi=600)
 
     plt.show()
 

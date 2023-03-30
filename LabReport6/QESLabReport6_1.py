@@ -23,7 +23,7 @@ Q_k = 8.3e17
 # salinity balance - the total amount of salt added or removed to the surface boxes
 Fw = 0.1  # low latitude evaporation - precipitation in units of m yr-1
 Sref = 35  # reference salinity in units of g kg-1
-E = Fw * SA_ocean * (1 - fSA_hilat) * Sref  # amount of salt removed from the low latitude box,  g kg-1 yr-1, ~ kg m-3 yr-1
+E = Fw * SA_ocean * (1 - fSA_hilat) * Sref  # amount of salt removed from t low latitude box,  g kg-1 yr-1, ~ kg m-3 yr-1
 
 # NOTE: Initial DIC, TA, PO4 and pCO2 values are set to steady state values from the Ocean Acidification model.
 
@@ -33,7 +33,7 @@ n_diss = 2.0  # unitless
 Omega_crit = 2.5  # unitless
 calc_slope = 0.12  # f_CaCO3 / Omega
 
-rho_org = 1100
+rho_org = 1200
 rho_CaCO3 = 2700
 
 
@@ -76,7 +76,7 @@ def create_dicts():
         'PO4': 1.65460e-04,  # Phosphate conc, mol m-3
         'f_CaCO3': 0.30453,  # fraction of organic matter export that produces CaCO3 at starting [CO3]
         'k_ballast': 0.1609,
-        'rho_particle': 1416.27,
+        'rho_particle': 1568.14,
     }
     init_lolat['V'] = init_lolat['SA'] * init_lolat['depth']  # box volume, m3
 
@@ -104,16 +104,43 @@ def create_dicts():
 
     return [init_lolat, init_hilat, init_deep, init_atmos]
 
+
 def run():
-    # perform baseline model run
-    # oadicts = create_dicts()
-    # oatime, oadicts = acidification_model(oadicts, 2000, 0.5)
-    # oalolat, oahilat, oadeep, oaatmos = oadicts
-    # vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'Omega']
-    # plot.boxes(oatime, vars, oalolat, oahilat, oadeep, oaatmos)
+    vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'GtC_emissions']
+
+    odicts = create_dicts()
+
+    tmax = 2000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = odicts[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+
+    odicts[3] = emit_atmos
+
+    otime, odicts = original_model(odicts, 2000, 0.5)
+    ololat, ohilat, odeep, oatmos = odicts
+
+
+    oadicts = create_dicts()
+
+    tmax = 2000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = oadicts[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+
+    oadicts[3] = emit_atmos
+
+    oatime, oadicts = acidification_model(oadicts, 2000, 0.5)
+    oalolat, oahilat, oadeep, oaatmos = oadicts
+
 
     bldicts = create_dicts()
-
 
     tmax = 2000  # how many years to simulate (yr)
     dt = 0.5  # the time step of the simulation (yr)
@@ -128,13 +155,22 @@ def run():
     bltime, bldicts = ballasting_model(bldicts, 2000, 0.5)
     bllolat, blhilat, bldeep, blatmos = bldicts
     vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'GtC_emissions']
-    plot.boxes(bltime, vars, bllolat, blhilat, bldeep, blatmos)
 
-    # for k, v in helpers.get_last_values(ohilat, ololat, odeep, oatmos).items():
-        # print(k)
-        # for var in vars:
-           #  if var in v:
-                # print(f"  {var}: {v[var]:.5f}")
+
+    fig, axs = plot.boxes(otime, vars, ololat, ohilat, odeep, oatmos)
+
+    plot.boxes(oatime, vars, oalolat, oahilat, oadeep, oaatmos, axs=axs, ls=':', label='Acidification')
+    plot.boxes(bltime, vars, bllolat, blhilat, bldeep, blatmos, axs=axs, ls='--', label='Ballasting')
+
+    # y_min = [200, 2.21, 1.9]
+    # y_max = [1200, 2.32, 2.45]
+
+    # for i in range(3):
+        # axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
+        # axs[i].set_ylim(y_min[i], y_max[i])
+
+    plt.savefig('QESLabReport16_2', dpi=600)
+
     plt.show()
 
 

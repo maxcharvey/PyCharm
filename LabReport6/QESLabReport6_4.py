@@ -23,7 +23,7 @@ n_diss = 2.0  # unitless
 Omega_crit = 2.5  # unitless
 calc_slope = 0.12  # f_CaCO3 / Omega
 
-rho_org = 1100
+rho_org = 1200
 rho_CaCO3 = 2700
 
 # NOTE: Initial DIC, TA, PO4 and pCO2 values are set to steady state values from the Ocean Acidification model.

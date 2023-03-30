@@ -75,7 +75,7 @@ init_atmos = {
 init_atmos['pCO2'] = (init_atmos['moles_CO2'] * 1e6) / init_atmos['moles_air']  # carbon ppm
 
 
-tmax = 3000  # how many years to simulate (yr)
+tmax = 10000  # how many years to simulate (yr)
 dt = 0.5  # the time step of the simulation (yr)
 time = np.arange(0, tmax + dt, dt)  # the time axis for the model
 
@@ -90,4 +90,12 @@ final_lolat, final_hilat, final_deep, final_atmos = output
 
 fig, axs = plot.boxes(time, ['pCO2', 'DIC', 'GtC_emissions'], final_lolat, final_hilat, final_deep, final_atmos)
 
+plt.savefig('QESLabReport14', dpi=600)
+
+print((final_lolat['DIC'][-1] - final_lolat['DIC'][1]) * 12 / 1e15 * init_lolat['V'])
+print((final_hilat['DIC'][-1] - final_hilat['DIC'][1]) * 12 / 1e15 * init_hilat['V'])
+print((final_deep['DIC'][-1] - final_deep['DIC'][1]) * 12 / 1e15 * init_deep['V'])
+
 plt.show()
+
+
