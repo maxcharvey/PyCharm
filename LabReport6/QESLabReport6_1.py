@@ -95,7 +95,7 @@ def create_dicts():
         'mass': 5.132e18,  # kg
         'moles_air': 1.736e20,  # moles
         'moles_CO2': 872e15 / 12,  # moles
-        'GtC_emissions': 0.0  # annual emissions of CO2 into the atmosphere, GtC
+        'GtC_emissions': 0.0,  # annual emissions of CO2 into the atmosphere, GtC
     }
     init_atmos['pCO2'] = init_atmos['moles_CO2'] / init_atmos['moles_air'] * 1e6
 
@@ -105,7 +105,27 @@ def create_dicts():
     return [init_lolat, init_hilat, init_deep, init_atmos]
 
 
-def run():
+def run1():
+    effdicts = create_dicts()
+    efflolat, effhilat, effdeep, effatmos = effdicts
+
+    new_fCaCO3 = np.linspace(0, 1, 1000)
+    for box in [efflolat, effhilat]:
+        v = particle_velocity / (box['rho_particle'] - 1000) * (
+                    (rho_org + new_fCaCO3 * (100 / 30) * rho_org) /
+                    (1 + new_fCaCO3 * (100 / 30) * (rho_org / rho_CaCO3))
+                    - 1000)
+        box['particle_sinking_time'] = box['depth'] / v
+        export_efficiency = np.exp(-box['k_ballast'] * box['particle_sinking_time'])
+        plt.plot(new_fCaCO3, export_efficiency)
+        plt.plot(new_fCaCO3, export_efficiency * new_fCaCO3)
+
+    plt.savefig('QESLabReport16_1', dpi=600)
+
+    plt.show()
+
+
+def run2():
     vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'GtC_emissions']
 
     odicts = create_dicts()
@@ -174,5 +194,9 @@ def run():
     plt.show()
 
 
+def run3():
+    plt.show()
+
+
 if __name__ == "__main__":
-    run()
+    run1()
