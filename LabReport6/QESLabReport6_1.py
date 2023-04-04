@@ -117,8 +117,16 @@ def run1():
                     - 1000)
         box['particle_sinking_time'] = box['depth'] / v
         export_efficiency = np.exp(-box['k_ballast'] * box['particle_sinking_time'])
-        plt.plot(new_fCaCO3, export_efficiency)
-        plt.plot(new_fCaCO3, export_efficiency * new_fCaCO3)
+        if box == efflolat:
+            plt.plot(new_fCaCO3, export_efficiency, c='black', ls='--', label='Low latitude Organic')
+            plt.plot(new_fCaCO3, export_efficiency * new_fCaCO3, c='black', ls='-', label='Low latitude CaCO3')
+        else:
+            plt.plot(new_fCaCO3, export_efficiency, c='blue', ls='--', label='High latitude Organic')
+            plt.plot(new_fCaCO3, export_efficiency * new_fCaCO3, c='blue', ls='-', label='High latitude CaCO3')
+
+    plt.legend()
+    plt.xlabel('$f_{CaCO_3}$ (unitless)')
+    plt.ylabel('Export efficiency (unitless)')
 
     plt.savefig('QESLabReport16_1', dpi=600)
 
@@ -130,57 +138,74 @@ def run2():
 
     odicts = create_dicts()
 
-    tmax = 2000  # how many years to simulate (yr)
+    tmax = 3000  # how many years to simulate (yr)
     dt = 0.5  # the time step of the simulation (yr)
     time = np.arange(0, tmax + dt, dt)  # the time axis for the model
 
     emit_atmos = odicts[3].copy()  # create a copy of the original atmosphere input dictionary
     emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
-    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+    emit_atmos['GtC_emissions'][(time > 400) & (time <= 600)] = 8.0
 
     odicts[3] = emit_atmos
 
-    otime, odicts = original_model(odicts, 2000, 0.5)
+    otime, odicts = original_model(odicts, 3000, 0.5)
     ololat, ohilat, odeep, oatmos = odicts
 
 
     oadicts = create_dicts()
 
-    tmax = 2000  # how many years to simulate (yr)
+    tmax = 3000  # how many years to simulate (yr)
     dt = 0.5  # the time step of the simulation (yr)
     time = np.arange(0, tmax + dt, dt)  # the time axis for the model
 
     emit_atmos = oadicts[3].copy()  # create a copy of the original atmosphere input dictionary
     emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
-    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+    emit_atmos['GtC_emissions'][(time > 400) & (time <= 600)] = 8.0
 
     oadicts[3] = emit_atmos
 
-    oatime, oadicts = acidification_model(oadicts, 2000, 0.5)
+    oatime, oadicts = acidification_model(oadicts, 3000, 0.5)
     oalolat, oahilat, oadeep, oaatmos = oadicts
 
 
     bldicts = create_dicts()
 
-    tmax = 2000  # how many years to simulate (yr)
+    tmax = 3000  # how many years to simulate (yr)
     dt = 0.5  # the time step of the simulation (yr)
     time = np.arange(0, tmax + dt, dt)  # the time axis for the model
 
     emit_atmos = bldicts[3].copy()  # create a copy of the original atmosphere input dictionary
     emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
-    emit_atmos['GtC_emissions'][(time > 800) & (time <= 1000)] = 8.0
+    emit_atmos['GtC_emissions'][(time > 400) & (time <= 600)] = 8.0
 
     bldicts[3] = emit_atmos
 
-    bltime, bldicts = ballasting_model(bldicts, 2000, 0.5)
+    bltime, bldicts = ballasting_model(bldicts, 3000, 0.5)
     bllolat, blhilat, bldeep, blatmos = bldicts
-    vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3', 'GtC_emissions']
+    vars = ['DIC', 'TA', 'pCO2', 'f_CaCO3']
 
 
     fig, axs = plot.boxes(otime, vars, ololat, ohilat, odeep, oatmos)
 
     plot.boxes(oatime, vars, oalolat, oahilat, oadeep, oaatmos, axs=axs, ls=':', label='Acidification')
     plot.boxes(bltime, vars, bllolat, blhilat, bldeep, blatmos, axs=axs, ls='--', label='Ballasting')
+
+    axs[0].set_ylabel('DIC ($mol \; m^{-3}$)')
+    axs[1].set_ylabel('TA ($mol \; m^{-3}$)')
+    axs[2].set_ylabel('$pCO_2$ (ppm)')
+    axs[3].set_ylabel('$f_{CaCO_3}$ (unitless)')
+    axs[3].set_xlabel('Time (years)')
+
+    axs[2].legend(title='Model', loc='right')
+    axs[3].legend(title='Box', loc='right')
+
+    emission = np.linspace(400, 600, 200)
+    y_min = [1.5, 2.2, 200, -0.2]
+    y_max = [2.5, 2.4, 1200, 0.4]
+
+    for i in range(4):
+        axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
+        axs[i].set_ylim(y_min[i], y_max[i])
 
     # y_min = [200, 2.21, 1.9]
     # y_max = [1200, 2.32, 2.45]
@@ -191,12 +216,152 @@ def run2():
 
     plt.savefig('QESLabReport16_2', dpi=600)
 
+
+    #print(ohilat['DIC'][400], ololat['DIC'][400], odeep['DIC'][400])
+    ##print(ohilat['TA'][400], ololat['TA'][400], odeep['TA'][400])
+    #print(ohilat['pCO2'][400], ololat['pCO2'][400], oatmos['pCO2'][400])
+    #print(oahilat['DIC'][400], oalolat['DIC'][400], oadeep['DIC'][400])
+    #print(oahilat['TA'][400], oalolat['TA'][400], oadeep['TA'][400])
+    #print(oahilat['pCO2'][400], oalolat['pCO2'][400], oaatmos['pCO2'][400])
+    #print(blhilat['DIC'][400], bllolat['DIC'][400], bldeep['DIC'][400])
+    #print(blhilat['TA'][400], bllolat['TA'][400], bldeep['TA'][400])
+    #print(blhilat['pCO2'][400], bllolat['pCO2'][400], blatmos['pCO2'][400])
+
+    #print(ohilat['DIC'][10000], ololat['DIC'][10000], odeep['DIC'][10000])
+    #print(ohilat['TA'][10000], ololat['TA'][10000], odeep['TA'][10000])
+    #print(ohilat['pCO2'][10000], ololat['pCO2'][10000], oatmos['pCO2'][10000])
+    #print(oahilat['DIC'][10000], oalolat['DIC'][10000], oadeep['DIC'][10000])
+    #print(oahilat['TA'][10000], oalolat['TA'][10000], oadeep['TA'][10000])
+    #print(oahilat['pCO2'][10000], oalolat['pCO2'][10000], oaatmos['pCO2'][10000])
+    #print(blhilat['DIC'][10000], bllolat['DIC'][10000], bldeep['DIC'][10000])
+    #print(blhilat['TA'][10000], bllolat['TA'][10000], bldeep['TA'][10000])
+    #print(blhilat['pCO2'][10000], bllolat['pCO2'][10000], blatmos['pCO2'][10000])
+
+    #print(ohilat['V'])
+    #print(ololat['V'])
+    #print(odeep['V'])
+
     plt.show()
 
 
 def run3():
+    bldicts1 = create_dicts()
+
+    tmax = 1000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = bldicts1[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 200) & (time <= 400)] = 8.0
+
+    bldicts1[3] = emit_atmos
+
+    bltime1, bldicts1 = ballasting_model(bldicts1, 1000, 0.5)
+    bllolat1, blhilat1, bldeep1, blatmos1 = bldicts1
+
+    vars = ['pCO2', 'GtC_emissions']
+
+    fig, axs = plot.boxes(bltime1, vars, bllolat1, blhilat1, bldeep1, blatmos1)
+
+    years_list = [100, 25]
+    linestyles = [':', '--']
+
+    for i in range(2):
+        bldicts2 = create_dicts()
+
+        tmax = 1000  # how many years to simulate (yr)
+        dt = 0.5  # the time step of the simulation (yr)
+        time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+        emission_amount = 1600 / years_list[i]
+
+        emit_atmos = bldicts2[3].copy()  # create a copy of the original atmosphere input dictionary
+        emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+        emit_atmos['GtC_emissions'][(time > 300 - (years_list[i]/2)) & (time <= 300 + (years_list[i]/2))] = emission_amount
+
+        bldicts2[3] = emit_atmos
+
+        bltime2, bldicts2 = ballasting_model(bldicts2, 1000, 0.5)
+        bllolat2, blhilat2, bldeep2, blatmos2 = bldicts2
+
+        vars = ['pCO2', 'GtC_emissions']
+
+        plot.boxes(bltime2, vars, bllolat2, blhilat2, bldeep2, blatmos2, axs=axs, ls=linestyles[i], label=f'{years_list[i]} years')
+
+    axs[0].set_ylabel('$pCO_2$ (ppm)')
+    axs[1].set_ylabel('Carbon Emissions (GtC)')
+    axs[1].set_xlabel('Time (years)')
+    axs[0].legend(title='Emission duration (years)', loc='right')
+    axs[1].legend(title='Box', loc='right')
+
+    plt.savefig('QESLabReport16_3', dpi=600)
+
+    plt.show()
+
+
+def run4():
+    bldicts1 = create_dicts()
+
+    tmax = 1000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = bldicts1[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emit_atmos['GtC_emissions'][(time > 200) & (time <= 400)] = 8.0
+
+    bldicts1[3] = emit_atmos
+
+    bltime1, bldicts1 = ballasting_model(bldicts1, 1000, 0.5)
+    bllolat1, blhilat1, bldeep1, blatmos1 = bldicts1
+
+    vars = ['pCO2', 'GtC_emissions']
+
+    fig, axs = plot.boxes(bltime1, vars, bllolat1, blhilat1, bldeep1, blatmos1, ls='-', lw=0.9)
+
+
+    bldicts2 = create_dicts()
+
+    tmax = 1000  # how many years to simulate (yr)
+    dt = 0.5  # the time step of the simulation (yr)
+    time = np.arange(0, tmax + dt, dt)  # the time axis for the model
+
+    emit_atmos = bldicts2[3].copy()  # create a copy of the original atmosphere input dictionary
+    emit_atmos['GtC_emissions'] = np.zeros(time.shape)  # creat an array to hold the emission scenario
+    emission_phase = np.random.dirichlet(np.ones(400), size=1)
+    emission_phase_array = emission_phase.reshape(-1)
+    print(sum(emission_phase_array))
+    emit_atmos['GtC_emissions'][(time > 200) & (time <= 400)] = emission_phase_array * 3200
+
+    bldicts2[3] = emit_atmos
+
+    bltime2, bldicts2 = ballasting_model(bldicts2, 1000, 0.5)
+    bllolat2, blhilat2, bldeep2, blatmos2 = bldicts2
+
+    vars = ['pCO2', 'GtC_emissions']
+
+    plot.boxes(bltime2, vars, bllolat2, blhilat2, bldeep2, blatmos2, axs=axs, ls=':', label='random')
+
+    axs[0].set_ylabel('$pCO_2$ (ppm)')
+    axs[1].set_ylabel('Carbon Emissions (GtC)')
+    axs[1].set_xlabel('Time (years)')
+    axs[0].legend(title='Emission profile', loc='right')
+    axs[0].legend(title='Box', loc='right')
+
+    emission = np.linspace(200, 400, 200)
+    y_min = [0, 0]
+    y_max = [1200, 15]
+
+    for i in range(2):
+        axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
+        axs[i].set_ylim(y_min[i], y_max[i])
+
+    plt.savefig('QESLabReport16_4', dpi=600)
+
     plt.show()
 
 
 if __name__ == "__main__":
-    run1()
+    run3()
+    run4()

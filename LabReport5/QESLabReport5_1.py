@@ -252,6 +252,9 @@ def run():
     # axs[-1].plot(time, emit_atmos['GtC_emissions'], c='orange')
     # axs[-1].legend(fontsize=8)
 
+    axs[1].legend(title='Model', loc='right')
+    axs[2].legend(title='Box')
+
     emission = np.linspace(200, 400, 200)
 
     y_min = [200, 2.21, 1.9]
@@ -261,16 +264,21 @@ def run():
         axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
         axs[i].set_ylim(y_min[i], y_max[i])
 
-    for k, v in helpers.get_last_values(hilat, lolat, atmos).items():
-        print(k, v['pCO2'])
-    for k, v in helpers.get_last_values(X1_hilat, X1_lolat, X1_atmos).items():
-        print(k, v['pCO2'])
-    for k, v in helpers.get_last_values(X2_hilat, X2_lolat, X2_atmos).items():
-        print(k, v['pCO2'])
+    for k, v in helpers.get_last_values(hilat, lolat, deep).items():
+        print(k, v['DIC'])
+    for k, v in helpers.get_last_values(X1_hilat, X1_lolat, X1_deep).items():
+        print(k, v['DIC'])
+    for k, v in helpers.get_last_values(X2_hilat, X2_lolat, X2_deep).items():
+        print(k, v['DIC'])
 
-    print(atmos['pCO2'][400])
-    print(X1_atmos['pCO2'][400])
-    print(X2_atmos['pCO2'][400])
+    print(hilat['TA'][400], lolat['TA'][400], deep['TA'][400])
+    print(X1_hilat['TA'][400], X1_lolat['TA'][400], X1_deep['TA'][400])
+    print(X2_hilat['TA'][400], X2_lolat['TA'][400], X2_deep['TA'][400])
+
+    axs[0].set_ylabel(r'$pCO_2$ (ppm)')
+    axs[1].set_ylabel(r'TA ($mol \; m^{-3}$)')
+    axs[2].set_ylabel(r'DIC ($mol \; m^{-3}$)')
+    axs[2].set_xlabel('Time (years)')
 
     plt.savefig('QESLabReport15', dpi=600)
 

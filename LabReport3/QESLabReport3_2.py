@@ -148,20 +148,23 @@ time, lolat, hilat3, deep = ocean_model(orig_lolat, orig_hilat, init_deep, 1000,
 init_hilat = orig_hilat
 
 fig, axs = plot.boxes(time, ['T', 'S'], hilat, ls='solid', label='100')
-fig, axs = plot.boxes(time, ['T', 'S'], hilat2, axs=axs, ls='dotted', label='50')
-fig, axs = plot.boxes(time, ['T', 'S'], hilat3, axs=axs, ls='dashed', label='200')
+fig1, axs = plot.boxes(time, ['T', 'S'], hilat2, axs=axs, ls='dotted', label='50')
+fig2, axs = plot.boxes(time, ['T', 'S'], hilat3, axs=axs, ls='dashed', label='200')
 
-plt.legend()
+plt.legend(title=r'Hilat $\tau_m$ values (years)')
 axs[0].set_xlim(0, 200)
 axs[1].set_xlim(0, 200)
+axs[0].set_ylabel('Temperature ( ̊C)')
+axs[1].set_ylabel('Salinity (PSS)')
+axs[1].set_xlabel('Time (years)')
+
+
 
 model_vars = ['T', 'S']
 for var in model_vars:
     print(var)
     for box in [hilat, lolat, deep]:
         print(f"  {box['name']}: {box[var][-1]:.2f}")
-
-plt.suptitle('Sensitivity of Surface-Deep exchange analysis for temperature and salinity ')
 
 plt.savefig('QESLabReport13', dpi=600)
 

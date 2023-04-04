@@ -81,13 +81,12 @@ for i in axs:
 
 axs[0].legend()
 axs[1].legend()
-axs[2].legend()
+axs[2].legend(title='Atmosphere Ocean Relaxation timescale (years)', loc='right')
 axs[0].set_ylabel('Temperature ( ̊C)')
 axs[1].set_ylabel('Salinity (PSS)')
 axs[2].set_ylabel('Latitudinal flow strength ($m^{3}yr^{-1}$)')
 axs[2].set_xlabel('Time (years)')
-plt.suptitle("Sensitivity analysis of salinity and temperature for different timescales of atmosphere"
-             "ocean relaxation", size='x-large')
+
 
 plt.savefig('QESLabReport12', dpi=600)
 

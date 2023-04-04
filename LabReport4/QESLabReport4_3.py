@@ -88,7 +88,20 @@ dicts = (init_lolat, init_hilat, init_deep, emit_atmos)
 time, output = ocean_model(dicts, tmax, dt)
 final_lolat, final_hilat, final_deep, final_atmos = output
 
-fig, axs = plot.boxes(time, ['pCO2', 'DIC', 'GtC_emissions'], final_lolat, final_hilat, final_deep, final_atmos)
+fig, axs = plot.boxes(time, ['pCO2', 'DIC'], final_lolat, final_hilat, final_deep, final_atmos)
+
+
+emission = np.linspace(500, 700, 200)
+y_min = [1000, 2.21]
+y_max = [2200, 2.4]
+
+for i in range(2):
+    axs[i].fill_between(emission, y_max[i], y_min[i], color='lightgray')
+    axs[i].set_ylim(y_min[i], y_max[i])
+
+axs[0].set_ylabel(r'$pCO_2$ (ppm)')
+axs[1].set_ylabel(r'DIC ($mol \; m^{-3}$)')
+axs[1].set_xlabel('Time (years)')
 
 plt.savefig('QESLabReport14', dpi=600)
 

@@ -55,10 +55,6 @@ axs[0].fill_between(steps, 27, 15, color='lightgray')
 axs[0].fill_between(steps, -5, 5, color='lightgray')
 axs[2].legend(title='Values of D', ncols=3, fancybox=True)
 axs[1].legend()
-axs[0].text(60, 10, "Low latitude values shown by the grey box above and high latitude ones shown in the grey box below")
-
-plt.suptitle('Effect of initial temperature on equilibrium temperature values '
-             'for different values of the diffusion constant', size='x-large')
 
 for i in axs:
     i.set_xlim(0, 350)
